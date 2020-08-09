@@ -1,0 +1,12 @@
+mysql:
+  name: mysql
+  container:
+    image:
+      name: mysql:5.6
+    port: 3306
+  strategy:
+    type: Recreate
+  service:
+    name: mysql
+    selector:
+      name: mysql
