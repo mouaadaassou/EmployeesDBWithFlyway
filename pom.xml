@@ -15,7 +15,7 @@
         <artifactId>flyway-maven-plugin</artifactId>
         <version>6.5.3</version>
         <configuration>
-          <url>jdbc:mysql://localhost/employees?serverTimezone=UTC</url>
+          <url>jdbc:mysql:${mysql}?serverTimezone=UTC</url>
           <user>${mysql.user}</user>
           <password>${mysql.password}</password>
           <driver>com.mysql.jdbc.Driver	</driver>

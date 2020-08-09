@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyway-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: flyway-job
+    spec:
+      initContainers:
+        - name: git-clone
+          image: alpine/git
+          args:
+            - clone
+            - --single-branch
+            - https://github.com/mouaadaassou/EmployeesDBWithFlyway.git
+            - /flyway-repo
+          securityContext:
+            runAsUser: 1 # Any non-root user will do. Match to the workload.
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /flyway-repo
+              name: git-repo
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: flyway
+          image: boxfuse/flyway:5.2.4
+          volumeMounts:
+            - mountPath: /flyway/sql
+              name: git-repo
+              subPath: src/main/resources/db/migration
+          args:
+            - info
+            - repair
+            - migrate
+            - info
+          env:
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: flyway-configmap
+                  key: flyway-jdbc-url
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: username
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+      restartPolicy: OnFailure
+      volumes:
+        - name: git-repo
+          emptyDir: {}

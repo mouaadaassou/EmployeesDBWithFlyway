@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyway-configmap
+data:
+  flyway-jdbc-url: jdbc:mysql://mysql/employees?serverTimezone=UTC
+  mysql-db: employees
